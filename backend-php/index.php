@@ -60,16 +60,19 @@ if ($apiIndex !== false && isset($pathParts[$apiIndex + 1])) {
             break;
     }
 } else {
+
     // 3. Not an API request -> serve Frontend
 
     // Check if it's a static file matching a resource on disk
-    // We are in backend-php/. If request is /main.js, check ./main.js
+    // If request is /main.js, check ./main.js (since we copied assets to backend-php/)
     $localFile = __DIR__ . $path;
-    if (file_exists($localFile) && is_file($localFile)) {
-        return false; // Let CLI server serve it
+    if (file_exists($localFile) && is_file($localFile) && $path !== '/index.php') {
+        // Return false lets the PHP CLI server serve the static file
+        return false;
     }
 
     // 4. SPA Fallback -> serve index.html
+    // For routes like /login, /dashboard -> Serve index.html
     if (file_exists(__DIR__ . '/index.html')) {
         readfile(__DIR__ . '/index.html');
     } else {
