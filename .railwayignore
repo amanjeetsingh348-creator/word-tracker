@@ -2,9 +2,6 @@ frontend/
 node_modules/
 .git/
 *.md
-server.js
-package.json
-package-lock.json
 fix-frontend-urls.ps1
 start_dev.ps1
 database/

@@ -1,0 +1,8 @@
+{
+    "name": "word-tracker/backend",
+    "description": "Word Tracker PHP Backend",
+    "require": {
+        "php": ">=8.1",
+        "ext-mysqli": "*"
+    }
+}
