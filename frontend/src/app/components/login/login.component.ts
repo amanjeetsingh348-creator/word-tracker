@@ -60,7 +60,7 @@ export class LoginComponent {
       }
     } catch (error) {
       console.error('Login error:', error);
-      this.errorMessage = 'Connection error. Make sure XAMPP is running and the backend is at: ' + environment.apiUrl;
+      this.errorMessage = 'Connection error. Please check your internet connection and try again. (' + environment.apiUrl + ')';
     } finally {
       this.isLoading = false;
     }
