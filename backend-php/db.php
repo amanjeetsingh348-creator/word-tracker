@@ -4,10 +4,12 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 // CORS Headers
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Content-Type: application/json; charset=UTF-8");
+if (!headers_sent()) {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Content-Type: application/json; charset=UTF-8");
+}
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
