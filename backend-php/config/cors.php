@@ -14,8 +14,7 @@ function handleCors()
         'http://localhost',                // Local XAMPP
         'http://localhost:8000',           // Alternative local port
         'https://word-tracker.vercel.app', // Vercel production (update with your actual domain)
-        // Add your Railway frontend domain here when deployed
-        // 'https://your-frontend.railway.app'
+        // NOTE: Railway domains (*.railway.app) are handled via pattern match below
     ];
 
     // Get the origin from the request
