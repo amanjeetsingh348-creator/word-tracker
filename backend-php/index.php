@@ -51,6 +51,9 @@ if ($apiIndex !== false && isset($pathParts[$apiIndex + 1])) {
         case 'add-progress':
             require 'api/add_progress.php';
             break;
+        case 'db-health':
+            require 'api/db-health.php';
+            break;
         default:
             http_response_code(404);
             echo json_encode(["message" => "Endpoint not found"]);
