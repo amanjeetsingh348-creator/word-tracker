@@ -15,7 +15,7 @@ function handleCors()
         'http://localhost:8000',           // Alternative local port
 
         // ADD YOUR RAILWAY FRONTEND URL HERE (Example):
-        // 'https://word-tracker-frontend-production.up.railway.app',
+        'https://word-tracker-production-c3bf.up.railway.app',
 
         // Vercel (if using)
         'https://word-tracker.vercel.app',
