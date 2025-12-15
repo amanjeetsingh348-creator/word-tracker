@@ -1,7 +1,18 @@
-[start]
-cmd = "php -S 0.0.0.0:$PORT index.php"
+[phases.setup]
+nixPkgs = ["php82", "nodejs_20", "npm"]
 
 [phases.install]
 cmds = [
-  "composer install --no-dev --optimize-autoloader --ignore-platform-reqs"
+  "composer install --no-dev --optimize-autoloader --ignore-platform-reqs",
+  "cd frontend && npm install"
 ]
+
+[phases.build]
+cmds = [
+  "cd frontend && npm run build -- --configuration production",
+  "mkdir -p public",
+  "cp -r frontend/dist/word-tracker/browser/* public/ 2>/dev/null || cp -r frontend/dist/word-tracker/* public/"
+]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT router.php"
