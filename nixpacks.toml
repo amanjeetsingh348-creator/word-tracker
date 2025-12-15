@@ -1,9 +1,13 @@
 [phases.setup]
-nixPkgs = ["php", "composer", "nodejs_20"]
+nixPkgs = ["php82", "nodejs_20"]
+
+[phases.setup.cmds]
+cmd = "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer"
 
 [phases.install]
 cmds = [
-  "composer install --no-dev --optimize-autoloader --ignore-platform-reqs",
+  "curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer || true",
+  "php composer.phar install --no-dev --optimize-autoloader --ignore-platform-reqs || composer install --no-dev --optimize-autoloader --ignore-platform-reqs",
   "cd frontend && npm install"
 ]
 
