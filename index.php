@@ -1,47 +1,24 @@
 <?php
-// backend-php/index.php
+// app/index.php
 
-// 1. Init Configuration
-require_once 'config/cors.php';
-require_once 'config/database.php';
+// NEVER echo before headers
+ob_start();
 
-// Handle Preflight and CORS headers
-handleCors();
+$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// 2. Parse URL to determine API Endpoint
-// Request URI comes in like /api/login or /word-tracker/backend-php/api/login depending on host
-$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$pathParts = explode('/', trim($request_uri, '/'));
-
-// Universal Router
-// Routes requests from /word-tracker/endpoint.php to /backend-php/api/endpoint.php
-// OR /endpoint.php to api/endpoint.php if served from root
-
-$path = parse_url($request_uri, PHP_URL_PATH);
-$filename = basename($path); // e.g. login.php or login
-
-// If no extension, assume .php
-if (strpos($filename, '.') === false) {
-    $filename .= '.php';
+// ---- API ROUTING ----
+if (strpos($request, '/api') === 0) {
+    require __DIR__ . '/api/index.php';
+    exit;
 }
 
-// Security: Prevent directory traversal
-$filename = basename($filename);
-
-$apiFile = __DIR__ . '/api/' . $filename;
-
-if (file_exists($apiFile)) {
-    require $apiFile;
-    exit; // IMPORTANT: Exit after serving API file to prevent double 404
+// ---- STATIC FILES ----
+$file = __DIR__ . '/public' . $request;
+if ($request !== '/' && file_exists($file)) {
+    return false;
 }
 
-// 3. Fallback / 404 - Only reached if API file not found
-http_response_code(404);
-header('Content-Type: application/json');
-echo json_encode([
-    "message" => "API Endpoint not found",
-    "status" => "error",
-    "path" => $request_uri,
-    "looking_for" => $apiFile
-]);
-?>
+// ---- ANGULAR SPA FALLBACK ----
+header("Content-Type: text/html; charset=UTF-8");
+readfile(__DIR__ . '/public/index.html');
+exit;
