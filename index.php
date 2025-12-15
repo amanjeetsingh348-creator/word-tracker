@@ -1,50 +1,68 @@
 <?php
 ob_start();
 
-// 1. Parse Request
-$requestUri = $_SERVER['REQUEST_URI'];
-$path = parse_url($requestUri, PHP_URL_PATH);
+/**
+ * MAIN FRONT CONTROLLER
+ * - Routes /api/* to PHP backend
+ * - Serves Angular static files
+ * - Handles SPA fallback correctly
+ */
 
-// 2. API Routing
+// Normalize request path (remove query string)
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = rtrim($path, '/') ?: '/';
+
+// ---------------- API ROUTING ----------------
 if (strpos($path, '/api') === 0) {
     require __DIR__ . '/api/index.php';
     exit;
 }
 
-// 3. Static Files (Serve assets directly if they exist)
-// Note: Adapting to Railway layout where Angular builds to frontend/dist/word-tracker/browser
-$baseDistPath = __DIR__ . '/frontend/dist/word-tracker/browser';
-$filePath = $baseDistPath . $path;
+// ---------------- ANGULAR DIST PATH ----------------
+$distPath = __DIR__ . '/frontend/dist/word-tracker/browser';
 
-if ($path !== '/' && file_exists($filePath) && is_file($filePath)) {
-    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+// ---------------- STATIC FILES ----------------
+$filePath = realpath($distPath . $path);
+
+if (
+    $path !== '/' &&
+    $filePath &&
+    strpos($filePath, realpath($distPath)) === 0 &&
+    is_file($filePath)
+) {
+    $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
     $mimes = [
         'js' => 'application/javascript',
         'css' => 'text/css',
         'png' => 'image/png',
         'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
         'gif' => 'image/gif',
         'svg' => 'image/svg+xml',
         'ico' => 'image/x-icon',
         'html' => 'text/html',
-        'json' => 'application/json'
+        'json' => 'application/json',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2'
     ];
-    $mime = isset($mimes[$ext]) ? $mimes[$ext] : 'application/octet-stream';
-    header("Content-Type: $mime");
+
+    header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
+    header('Cache-Control: public, max-age=31536000');
+
     readfile($filePath);
     exit;
 }
 
-// 4. Angular SPA Fallback
-// If not API and not a static file, serve index.html
-header("Content-Type: text/html; charset=UTF-8");
-$indexHtml = $baseDistPath . '/index.html';
+// ---------------- SPA FALLBACK ----------------
+$indexHtml = $distPath . '/index.html';
 
 if (file_exists($indexHtml)) {
+    header('Content-Type: text/html; charset=UTF-8');
     readfile($indexHtml);
-} else {
-    // Graceful error if build is missing
-    echo "<h1>Maintenance</h1><p>System is updating. Please try again in 1 minute.</p>";
+    exit;
 }
-exit;
 
+// ---------------- SAFE FAIL ----------------
+http_response_code(503);
+echo 'Application is updating. Please try again shortly.';
+exit;
