@@ -13,21 +13,28 @@ function handleCors()
         'http://localhost:4200',           // Local Angular dev
         'http://localhost',                // Local XAMPP
         'http://localhost:8000',           // Alternative local port
-        'https://word-tracker.vercel.app', // Vercel production (update with your actual domain)
-        // NOTE: Railway domains (*.railway.app) are handled via pattern match below
+
+        // ADD YOUR RAILWAY FRONTEND URL HERE (Example):
+        // 'https://word-tracker-frontend-production.up.railway.app',
+
+        // Vercel (if using)
+        'https://word-tracker.vercel.app',
     ];
 
     // Get the origin from the request
     $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 
-    // Check if origin is allowed or if we're in development
+    // Check if origin is allowed
     if (in_array($origin, $allowedOrigins)) {
         header("Access-Control-Allow-Origin: {$origin}");
     } elseif (getenv('RAILWAY_ENVIRONMENT') || strpos($origin, 'railway.app') !== false) {
-        // Allow Railway domains in production
+        // Allow all Railway domains in Railway environment
         header("Access-Control-Allow-Origin: {$origin}");
     } elseif (empty($origin) || $origin === 'null') {
         // For direct API access (testing)
+        header("Access-Control-Allow-Origin: *");
+    } else {
+        // Default: allow all for development (remove in production if needed)
         header("Access-Control-Allow-Origin: *");
     }
 

@@ -32,22 +32,16 @@ $apiFile = __DIR__ . '/api/' . $filename;
 
 if (file_exists($apiFile)) {
     require $apiFile;
-} else {
-    // Check if it's a known mapping
-    http_response_code(404);
-    echo json_encode([
-        "message" => "Endpoint not found: " . $filename,
-        "debug_path" => $apiFile
-    ]);
+    exit; // IMPORTANT: Exit after serving API file to prevent double 404
 }
 
-// 3. Fallback / 404
-// Since we are a Backend-Only API now, we do NOT serve frontend files or HTML.
+// 3. Fallback / 404 - Only reached if API file not found
 http_response_code(404);
 header('Content-Type: application/json');
 echo json_encode([
     "message" => "API Endpoint not found",
     "status" => "error",
-    "path" => $request_uri
+    "path" => $request_uri,
+    "looking_for" => $apiFile
 ]);
 ?>
